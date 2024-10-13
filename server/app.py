@@ -41,19 +41,27 @@ class EpisodesById(Resource):
 class Appearances(Resource):
     def post(self):
         data = request.json
-        new_appearance = Appearance(
-            rating = data.get('rating'),
-            episode_id = data.get('episode_id'),
-            guest_id = data.get('guest_id')
-        )
-        try:
-            db.session.add(new_appearance)
-            db.session.commit()
-            response_dict = new_appearance.to_dict()
-            return make_response(jsonify(response_dict), 201)
-        except Exception as e:
-            db.session.rollback()
+        rating = data.get('rating')
+        episode_id = data.get('episode_id')
+        guest_id = data.get('guest_id')
+
+        episode = Episode.query.filter_by(id = episode_id).first()
+        guest = Guest.query.filter_by(id = guest_id).first()
+
+        if not episode or not guest:
+            return make_response(jsonify({"errors": ["Episode or guest not found."]}), 404)
+        if not 1 <= rating <= 5:
             return make_response(jsonify({"errors": ["Validation errors"]}), 422)
+
+        new_appearance = Appearance(
+            rating = rating,
+            episode_id = episode_id,
+            guest_id = guest_id
+        )
+        db.session.add(new_appearance)
+        db.session.commit()
+        response_dict = new_appearance.to_dict()
+        return make_response(jsonify(response_dict), 201)
 
 api.add_resource(Home, '/')
 api.add_resource(Episodes, '/episodes')
