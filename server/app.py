@@ -38,6 +38,11 @@ class EpisodesById(Resource):
             }
             return make_response(jsonify(response_body), 404)
 
+class Guests(Resource):
+    def get(self):
+        response_dict_list = [guest.to_dict(rules=('-appearances',)) for guest in Guest.query.all()]
+        return make_response(jsonify(response_dict_list), 200)
+
 class Appearances(Resource):
     def post(self):
         data = request.json
@@ -66,6 +71,7 @@ class Appearances(Resource):
 api.add_resource(Home, '/')
 api.add_resource(Episodes, '/episodes')
 api.add_resource(EpisodesById, '/episodes/<int:id>')
+api.add_resource(Guests, '/guests')
 api.add_resource(Appearances, '/appearances')
 
 if __name__ == '__main__':
