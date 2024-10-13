@@ -16,6 +16,7 @@ api = Api(app)
 
 class Home(Resource):
     def get(self):
+        """Home route"""
         response_body = {
             "message" : "Welcome to the lateshow."
         }
@@ -23,11 +24,13 @@ class Home(Resource):
 
 class Episodes(Resource):
     def get(self):
+        """Get all episodes"""
         response_dict_list = [ep.to_dict(rules=('-appearances',)) for ep in Episode.query.all()]
         return make_response(jsonify(response_dict_list), 200)
 
 class EpisodesById(Resource):
     def get(self, id):
+        """Get an episode by it's id"""
         episode = Episode.query.filter_by(id = id).first()
         if episode:
             response_dict = episode.to_dict()
@@ -40,11 +43,13 @@ class EpisodesById(Resource):
 
 class Guests(Resource):
     def get(self):
+        """Get all guests"""
         response_dict_list = [guest.to_dict(rules=('-appearances',)) for guest in Guest.query.all()]
         return make_response(jsonify(response_dict_list), 200)
 
 class Appearances(Resource):
     def post(self):
+        """Post a new appearance"""
         data = request.json
         rating = data.get('rating')
         episode_id = data.get('episode_id')
